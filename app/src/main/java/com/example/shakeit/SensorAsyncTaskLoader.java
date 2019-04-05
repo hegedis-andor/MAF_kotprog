@@ -7,13 +7,25 @@ import android.support.v4.content.AsyncTaskLoader;
 
 public class SensorAsyncTaskLoader extends AsyncTaskLoader<Void> {
 
+    private SensorDataUtil sensorDataUtil;
+
     public SensorAsyncTaskLoader(@NonNull Context context) {
         super(context);
+        sensorDataUtil = new SensorDataUtil(context);
     }
+
+    @Override
+    public void onStartLoading() {
+        super.onStartLoading();
+        forceLoad();
+    }
+
 
     @Nullable
     @Override
     public Void loadInBackground() {
+        sensorDataUtil.startAccelerometerListening();
+
         return null;
     }
 }

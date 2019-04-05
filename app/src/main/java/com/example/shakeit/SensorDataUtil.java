@@ -27,9 +27,9 @@ public class SensorDataUtil implements SensorEventListener {
         this.context = context;
         this.sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         this.sensorAccelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        sensorManager.registerListener(this, sensorAccelerometer , SensorManager.SENSOR_DELAY_NORMAL);
+        this.sensorManager.registerListener(this, sensorAccelerometer , SensorManager.SENSOR_DELAY_NORMAL);
 
-        this.countDownTimer = new CountDownTimer(1800, 300) {
+        this.countDownTimer = new CountDownTimer(1200, 300) {
             @Override
             public void onTick(long millisUntilFinished) { }
 
@@ -71,17 +71,17 @@ public class SensorDataUtil implements SensorEventListener {
                 if (speed > 4500) {
                     this.countDownTimer.cancel();
                     this.countDownTimer.start();
-                    sickCounter = sickCounter >= 60000 ?  60000 : sickCounter+3000;
+                    sickCounter = sickCounter >= 60000 ?  60000 : sickCounter+3500;
 
                 } else if (speed > 3000) {
                     this.countDownTimer.cancel();
                     this.countDownTimer.start();
-                    sickCounter = sickCounter >= 60000 ?  60000 : sickCounter+1800;
+                    sickCounter = sickCounter >= 60000 ?  60000 : sickCounter+2000;
 
                 } else if (speed > 1500) {
                     this.countDownTimer.cancel();
                     this.countDownTimer.start();
-                    sickCounter = sickCounter >= 60000 ?  60000 : sickCounter+1000;
+                    sickCounter = sickCounter >= 60000 ?  60000 : sickCounter+1400;
 
                 }
 
@@ -119,12 +119,14 @@ public class SensorDataUtil implements SensorEventListener {
         this.countDownTimer.cancel();
     }
 
-    public void resumeAccelerometerListening() {
+    public void startAccelerometerListening() {
         this.sensorManager.registerListener(this, sensorAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        this.countDownTimer.start();
     }
 
     public void pauseAccelerometerListening() {
         this.sensorManager.unregisterListener(this);
+        this.countDownTimer.cancel();
     }
 
     @Override

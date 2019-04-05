@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
-import android.hardware.SensorManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
@@ -16,14 +14,12 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String> {
+public class MainActivity extends AppCompatActivity /*implements LoaderManager.LoaderCallbacks<Void>*/ {
 
+    //private SensorAsyncTaskLoader sensorAsyncTaskLoader;
     private SensorDataUtil sensorDataUtil;
-    private int backgroundState;
     private ConstraintLayout constraintLayout;
     private ImageView emojiImageView;
 
@@ -39,12 +35,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
 
         this.sensorDataUtil = new SensorDataUtil(getApplicationContext());
+        //this.sensorAsyncTaskLoader = new SensorAsyncTaskLoader(getApplicationContext());
 
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver,
                 new IntentFilter("backgroundStateChange"));
 
     }
 
+
+    //receives state change by localbroadcast
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -52,6 +51,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
     };
 
+
+    //UI background and emoji changes by the received state
     public void changeBackground(int state) {
         switch (state) {
             case 0:
@@ -76,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     protected void onResume() {
         super.onResume();
-        this.sensorDataUtil.resumeAccelerometerListening();
+        this.sensorDataUtil.startAccelerometerListening();
         Log.e("resume", "sensordata");
     }
 
@@ -86,20 +87,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         this.sensorDataUtil.pauseAccelerometerListening();
         Log.e("Pause", "sensordata");
     }
-
+/*
     @NonNull
     @Override
-    public Loader<String> onCreateLoader(int i, @Nullable Bundle bundle) {
-        return null;
+    public Loader<Void> onCreateLoader(int i, @Nullable Bundle bundle) {
+        return new SensorAsyncTaskLoader(getApplicationContext());
     }
 
     @Override
-    public void onLoadFinished(@NonNull Loader<String> loader, String s) {
-
-    }
+    public void onLoadFinished(@NonNull Loader<Void> loader, String s) { }
 
     @Override
-    public void onLoaderReset(@NonNull Loader<String> loader) {
+    public void onLoaderReset(@NonNull Loader<Void> loader) {
 
-    }
+    }*/
 }
