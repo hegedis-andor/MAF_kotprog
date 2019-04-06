@@ -6,6 +6,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.MediaPlayer;
 import android.os.CountDownTimer;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
@@ -21,6 +22,7 @@ public class SensorDataUtil implements SensorEventListener {
     private CountDownTimer countDownTimer;
     private long lastUpdate = 0;
     private float last_x, last_y, last_z;
+    private MediaPlayer mediaPlayer;
 
 
     public SensorDataUtil(@NonNull Context context) {
@@ -28,7 +30,7 @@ public class SensorDataUtil implements SensorEventListener {
         this.sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         this.sensorAccelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         this.sensorManager.registerListener(this, sensorAccelerometer , SensorManager.SENSOR_DELAY_NORMAL);
-
+        this.mediaPlayer = mediaPlayer.create(context, R.raw.nonosound);
         this.countDownTimer = new CountDownTimer(1200, 300) {
             @Override
             public void onTick(long millisUntilFinished) { }
@@ -81,17 +83,19 @@ public class SensorDataUtil implements SensorEventListener {
                 } else if (speed > 1500) {
                     this.countDownTimer.cancel();
                     this.countDownTimer.start();
-                    sickCounter = sickCounter >= 60000 ?  60000 : sickCounter+1400;
+                    sickCounter = sickCounter >= 60000 ?  60000 : sickCounter+500;
 
                 }
 
-                if(sickCounter > 59999) {
+                if(sickCounter >= 60000) {
+                    if (!this.mediaPlayer.isPlaying()) this.mediaPlayer.start();
                     sendStateChange("3");
                 }
-                else if (sickCounter  > 39999)  {
+                else if (sickCounter  >= 32000)  {
                     sendStateChange("2");
                 }
-                else if (sickCounter > 19999)  {
+                else if (sickCounter >= 10000)  {
+                    if (this.mediaPlayer.isPlaying()) this.mediaPlayer.pause();
                     sendStateChange("1");
                 }
                 Log.e("Counter: " , String.valueOf(sickCounter));
@@ -111,6 +115,21 @@ public class SensorDataUtil implements SensorEventListener {
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
+
+
+    public void startAccelerometerListening() {
+        this.sensorManager.registerListener(this, sensorAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        this.countDownTimer.start();
+
+    }
+
+    public void pauseAccelerometerListening() {
+        this.sensorManager.unregisterListener(this);
+        this.countDownTimer.cancel();
+        if (this.mediaPlayer.isPlaying()) this.mediaPlayer.pause();
+    }
+
+
     private void restartCountdownTimer() {
         this.countDownTimer.start();
     }
@@ -119,15 +138,6 @@ public class SensorDataUtil implements SensorEventListener {
         this.countDownTimer.cancel();
     }
 
-    public void startAccelerometerListening() {
-        this.sensorManager.registerListener(this, sensorAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-        this.countDownTimer.start();
-    }
-
-    public void pauseAccelerometerListening() {
-        this.sensorManager.unregisterListener(this);
-        this.countDownTimer.cancel();
-    }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
