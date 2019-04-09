@@ -2,6 +2,7 @@ package com.example.shakeit;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
@@ -78,7 +79,7 @@ public class SensorDataUtil implements SensorEventListener {
                 // speed of movement
                 float speed = Math.abs(x + y + z - last_x - last_y - last_z)/ diffTime * 10000;
 
-                //The more hardly it shakes, the counter is incremented with bigger steps
+                //The bigger the speed the bigger the step of the sick counter
                 if (speed > 4500) {
                     this.countDownTimer.cancel();
                     this.countDownTimer.start();
@@ -119,7 +120,6 @@ public class SensorDataUtil implements SensorEventListener {
                     if (this.plsNoMP.isPlaying()) this.plsNoMP.pause();
                     sendStateChange("1");
                 }
-                Log.e("Counter: " , String.valueOf(sickCounter));
 
                 last_x = x;
                 last_y = y;
@@ -131,7 +131,6 @@ public class SensorDataUtil implements SensorEventListener {
     // localbroadcasting the sickness level based state, which determines the background.
     private void sendStateChange(String state) {
         Intent intent = new Intent("backgroundStateChange");
-        // You can also include some extra data.
         intent.putExtra("state", state);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
@@ -167,12 +166,18 @@ public class SensorDataUtil implements SensorEventListener {
             notificationManager.createNotificationChannel(channel);
         }
 
+        PendingIntent pendingIntent =
+                PendingIntent.getActivity(this.context, 0, new Intent(), 0);
+
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(
                 context, channelName != null ? channelName.toString() : null)
                         .setContentTitle("Stop, Stop, Stop!")
                         .setContentText("Please Stoooooppppppppppp!!!")
                         .setSmallIcon(R.drawable.sick)
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setAutoCancel(true)
+                        .setContentIntent(pendingIntent)
                         .setLargeIcon(BitmapFactory.decodeResource(context.getResources(),
                             R.drawable.sick));
 
