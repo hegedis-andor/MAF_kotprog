@@ -50,16 +50,6 @@ public class MainActivity extends AppCompatActivity  {
 
     }
 
-
-    //receives state change by localbroadcast
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-             changeBackground(Integer.parseInt(intent.getStringExtra("state")));
-        }
-    };
-
-
     //UI background and emoji changes by the received state
     public void changeBackground(int state) {
         switch (state) {
@@ -93,7 +83,13 @@ public class MainActivity extends AppCompatActivity  {
         }
     }
 
-
+    //receives state change by localbroadcast
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            changeBackground(Integer.parseInt(intent.getStringExtra("state")));
+        }
+    };
 
     public void noNoNotify() {
         CharSequence channelName = null;
