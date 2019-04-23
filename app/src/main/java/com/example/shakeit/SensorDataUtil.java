@@ -64,7 +64,10 @@ public class SensorDataUtil implements SensorEventListener {
 
                 // speed of movement
                 float speed = Math.abs(x + y + z - last_x - last_y - last_z)/ diffTime * 10000;
-//----------------------------------------------
+
+
+
+//------------    Logic of state change, notification and sound
                 //The bigger the speed the bigger the step of the sick counter
                 if (speed > 4500) {
                     this.countDownTimer.cancel();
@@ -83,7 +86,7 @@ public class SensorDataUtil implements SensorEventListener {
 
                 }
 //----------------------------------------------
-                // Logic of state change, notification and sound
+
                 if (counter >= 100000) {
                     //state -> 50 sick background, second sound
                     sendStateChange("50");
@@ -129,13 +132,13 @@ public class SensorDataUtil implements SensorEventListener {
 
     void startAccelerometerAndCountDown() {
         this.sensorManager.registerListener(this, sensorAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-        this.countDownTimer.start();
+        restartCountdownTimer();
 
     }
 
     void pauseAccelerometerAndCountDown() {
         this.sensorManager.unregisterListener(this);
-        this.countDownTimer.cancel();
+        cancelCountdownTimer();
     }
 
     private void restartCountdownTimer() {
