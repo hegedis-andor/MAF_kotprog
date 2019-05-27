@@ -140,5 +140,10 @@ public class MainActivity extends AppCompatActivity  {
         if (this.nononoMP.isPlaying()) this.nononoMP.pause();
         if (this.plsNoMP.isPlaying()) this.plsNoMP.pause();
     }
-
+    
+    
+    @Override
+    protected void onDestroy() {
+         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+    }
 }
